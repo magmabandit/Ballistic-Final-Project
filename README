@@ -1,0 +1,20 @@
+Use interactive window for better testing
+
+CURRENT TODO (mean squared) ERROR MEASUREMENT 
+impl located in: xgboost_basic_model
+
+
+complexities of models (from highest to lowest):
+1. goldonly
+2. basic
+3. intermediate
+4. advanced
+5. standard (from website)
+
+Accuracy of these SHOULD increase by some factor (obviously, see graphs)
+MSE could(?) be plugged into some Probability equation to measure:
+- Probability of model making an errant prediction outcome / "false alarm" given
+  certain model type / accuracy
+- probability of model accuracy increasing/changing when a variable is added
+- Accuracy% of model given how many variables
+
