@@ -6,7 +6,8 @@ import shap
 import matplotlib.pyplot as pl
 
 from sklearn.metrics import accuracy_score
-
+from sklearn.metrics import mean_squared_error as MSE
+from sklearn.metrics import log_loss as LOGLOSS
 
 #   
 # GOLD EARNED / SPENT SHAP MODEL
@@ -39,7 +40,7 @@ for c in cat_cols:
 allstats["wardsbought"] = allstats["wardsbought"].astype(np.int32)
 
 # List of features to exclude during model training
-# Must ALWAYS exclude win to prevent shitshow
+# Must ALWAYS exclude win to prevent disaster
 rate_features_rm = [
     "win", "kills", "deaths", "assists", "killingsprees", "doublekills",
     "triplekills", "quadrakills", "pentakills", "legendarykills",
@@ -79,16 +80,16 @@ feature_names = [full_names.get(n, n) for n in X.columns]
 X.columns = feature_names
 
 # create train/validation split
-Xt, Xv, yt, yv = train_test_split(X,y, test_size=0.2, random_state=10)
-dt = xgb.DMatrix(Xt, label=yt.values)
-dv = xgb.DMatrix(Xv, label=yv.values)
+Xt, Xv, y_train, y_test = train_test_split(X,y, test_size=0.2, random_state=10)
+dt = xgb.DMatrix(Xt, label=y_train.values)
+dv = xgb.DMatrix(Xv, label=y_test.values)
 
 params = {
     "eta": 0.5,
     "max_depth": 4,
     "objective": "binary:logistic",
     "silent": 1,
-    "base_score": np.mean(yt),
+    "base_score": np.mean(y_train),
     "eval_metric": "logloss"
 }
 model = xgb.train(params, dt, 300, [(dt, "train"),(dv, "valid")], early_stopping_rounds=5, verbose_eval=25)
@@ -111,3 +112,16 @@ shap.summary_plot(shap_values, Xv)
 # sort the features indexes by their importance in the model
 # (sum of SHAP value magnitudes over the validation dataset)
 shap.dependence_plot("Gold earned", shap_values, Xv, interaction_index="Gold spent")
+
+# --------------------------------
+# Accuracy / Error measurement
+# Assuming 'y_test' is  ground truth labels
+# --------------------------------
+
+y_test_pred = model.predict(dv)
+
+mse = MSE(y_test_pred, y_test)
+print("MSE : % f" %(mse)) 
+
+logloss = LOGLOSS(y_test,y_test_pred)
+print("LOGLOSS : % f" %(logloss))

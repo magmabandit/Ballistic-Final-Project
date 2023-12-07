@@ -4,6 +4,8 @@ import xgboost as xgb
 from sklearn.model_selection import train_test_split
 import shap
 import matplotlib.pyplot as pl
+from sklearn.metrics import mean_squared_error as MSE
+from sklearn.metrics import log_loss as LOGLOSS
 
 
 #   
@@ -42,6 +44,7 @@ X = allstats.drop(["win"], axis=1)
 y = allstats["win"]
 
 # convert all features we want to consider as rates
+# Must ALWAYS exclude win to prevent disaster
 rate_features = [
     "kills", "deaths", "assists", "killingsprees", "doublekills",
     "triplekills", "quadrakills", "pentakills", "legendarykills",
@@ -136,7 +139,26 @@ shap.force_plot(explainer.expected_value, shap_values[0,:], Xv.iloc[0,:])
 # (sum of SHAP value magnitudes over the validation dataset)
 top_inds = np.argsort(-np.sum(np.abs(shap_values), 0))
 
-# make SHAP plots of the three most important features
-for i in range(20):
-    shap.dependence_plot(top_inds[i], shap_values, Xv)
+
+# --------------------------------
+# Accuracy / Error measurement
+# Assuming 'y_v' is  ground truth labels
+# --------------------------------
+
+dv_temp = dv.get_data()
+
+rand_indices = np.random.choice(dt.num_row(), 307427, replace=True)
+# subset_dt = dt.slice(range(0,10000)) #(rand_indices)
+# subset_dv = dv.slice(range(0,10000))
+# y_pred = model.predict(subset_dt)
+
+dv_temp = dv.get_data()
+
+y_test_pred = model.predict(dv)
+
+mse = MSE(y_test_pred, yv)
+print("MSE : % f" %(mse)) 
+
+logloss = LOGLOSS(yv,y_test_pred)
+print("LOGLOSS : % f" %(logloss))
     

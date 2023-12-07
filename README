@@ -12,9 +12,10 @@ complexities of models (from highest to lowest):
 5. standard (from website)
 
 Accuracy of these SHOULD increase by some factor (obviously, see graphs)
-MSE could(?) be plugged into some Probability equation to measure:
+MSE and logloss can be used to model probabilistic equations in order to measure:
 - Probability of model making an errant prediction outcome / "false alarm" given
   certain model type / accuracy
 - probability of model accuracy increasing/changing when a variable is added
 - Accuracy% of model given how many variables
+- etc
 

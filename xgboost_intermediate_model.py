@@ -6,6 +6,8 @@ import shap
 import matplotlib.pyplot as pl
 
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import mean_squared_error as MSE
+from sklearn.metrics import log_loss as LOGLOSS
 
 #   
 # INTERMEDIATE SHAP MODEL
@@ -39,7 +41,7 @@ for c in cat_cols:
 allstats["wardsbought"] = allstats["wardsbought"].astype(np.int32)
 
 # List of features to exclude during model training
-# Must ALWAYS exclude win to prevent shitshow
+# Must ALWAYS exclude win to prevent disaster
 rate_features_rm = [
     "win", "deaths", "assists", "killingsprees", "doublekills",
     "triplekills", "quadrakills", "pentakills", "legendarykills",
@@ -124,12 +126,15 @@ shap.dependence_plot("Vision score per min", shap_values, Xv, interaction_index=
 shap.dependence_plot("Minion kills per min", shap_values, Xv, interaction_index="Gold earned per min")
 
 
-
-
-
+# --------------------------------
 # Accuracy / Error measurement
-# TODO: currently broken as fuck
-# Assuming 'y_test' is your ground truth labels
-predictions = model.predict(dv)
-accuracy = accuracy_score(y, predictions)
-print(f"Accuracy: {accuracy}")
+# Assuming 'y_v' is  ground truth labels
+# --------------------------------
+
+y_test_pred = model.predict(dv)
+
+mse = MSE(y_test_pred, yv)
+print("MSE : % f" %(mse)) 
+
+logloss = LOGLOSS(yv,y_test_pred)
+print("LOGLOSS : % f" %(logloss))

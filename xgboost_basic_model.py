@@ -7,6 +7,7 @@ import matplotlib.pyplot as pl
 
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import mean_squared_error as MSE
+from sklearn.metrics import log_loss as LOGLOSS
 
 #   
 # BASIC SHAP MODEL
@@ -39,7 +40,7 @@ for c in cat_cols:
 allstats["wardsbought"] = allstats["wardsbought"].astype(np.int32)
 
 # List of features to exclude during model training
-# Must ALWAYS exclude win to prevent shitshow
+# Must ALWAYS exclude win to prevent disaster
 rate_features_rm = [
     "win", "deaths", "assists", "killingsprees", "doublekills",
     "triplekills", "quadrakills", "pentakills", "legendarykills",
@@ -120,27 +121,13 @@ shap.dependence_plot("Kills per min", shap_values, Xv, interaction_index="Gold e
 
 # --------------------------------
 # Accuracy / Error measurement
-# TODO: currently broken as fuck
-# Assuming 'y_test' is your ground truth labels
+# Assuming 'y_v' is  ground truth labels
 # --------------------------------
 
-dv_temp = dv.get_data()
+y_test_pred = model.predict(dv)
 
-rand_indices = np.random.choice(dt.num_row(), 307427, replace=True)
-subset_dt = dt.slice(rand_indices)
-predictions = model.predict(subset_dt)
+mse = MSE(y_test_pred, yv)
+print("MSE : % f" %(mse)) 
 
-print(dt.num_row())
-print(predictions.size)
-
-# .num_row() and .size values SHOULD BE EQUAL, 
-# and both should be equal to predictions. Otherwise,
-# MSE computation cannot work (cant compare different output sizes)
-print(dv_temp.size)
-print(dv_temp.toarray().size)
-print(dv.num_row())
-
-
-# RMSE Computation 
-rmse = np.sqrt(MSE(dv_temp.toarray(), predictions)) 
-print("RMSE : % f" %(rmse)) 
+logloss = LOGLOSS(yv,y_test_pred)
+print("LOGLOSS : % f" %(logloss))
