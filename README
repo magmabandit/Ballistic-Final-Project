@@ -1,7 +1,8 @@
 Use interactive window for better testing
+impl located in: xgboost_standard_model
 
-CURRENT TODO (mean squared) ERROR MEASUREMENT 
-impl located in: xgboost_basic_model
+Thank you to Scott Lundberg for xgboost specific source code:
+https://shap-lrjball.readthedocs.io/en/latest/example_notebooks/tree_explainer/League%20of%20Legends%20Win%20Prediction%20with%20XGBoost.html
 
 
 complexities of models (from highest to lowest):
@@ -18,4 +19,3 @@ MSE and logloss can be used to model probabilistic equations in order to measure
 - probability of model accuracy increasing/changing when a variable is added
 - Accuracy% of model given how many variables
 - etc
-
